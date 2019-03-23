@@ -1,50 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using KVDB;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PluginTest : MonoBehaviour {
 
+    KVDBHandler kVDBHandler;
 
     public Text result;
     public InputField inputFieldKey;
     public InputField inputFieldValue;
 
-    AndroidJavaObject androidJavaClass;
-
-    private void Awake()
+    private void Start()
     {
-        Init();
-    }
-
-
-    // Use this for initialization
-    void Start () {
-
-
-        //try
-        //{
-
-            
-
-        //    string str=androidJavaClass.Call<string>("SetKey", "pankaj","vernma");
-
-
-        //    //var st = androidJavaClass.Call<string>("SetKey", "kk", "vv");
-
-        //    var st = androidJavaClass.Call<string>("GetValue", "pankaj");
-
-        //    //print("value "+st);
-
-        //    text.text = text.text+"" + str + " : "+st;
-        //}
-        //catch(Exception e)
-        //{
-        //    text.text = e.Message;
-        //}
-
-
+        kVDBHandler = new KVDBHandler();
     }
 
 
@@ -57,16 +25,8 @@ public class PluginTest : MonoBehaviour {
             result.text = "Error : Key is empty";
         else
         {
-            if(androidJavaClass.Call<bool>("HasKey", key))
-            {
-                result.text = "Key Updated";
-            }
-            else
-            {
-                result.text = "Key Added";
-            }
-
-            androidJavaClass.Call("SetKey", key, value);
+            kVDBHandler.AddKey(key, value);
+            result.text = "Key Added";
         }
     }
 
@@ -79,15 +39,16 @@ public class PluginTest : MonoBehaviour {
             result.text = "Error : Key is empty";
         else
         {
-            if (androidJavaClass.Call<bool>("HasKey", key))
+            if (kVDBHandler.HasKey(key))
             {
-                result.text = androidJavaClass.Call<string>("GetValue", key);
+                result.text = kVDBHandler.GetValue(key);
             }
             else
             {
                 result.text = "Error : Key Not found";
             }
         }
+
 
     }
 
@@ -100,9 +61,9 @@ public class PluginTest : MonoBehaviour {
             result.text = "Error : Key is empty";
         else
         {
-            if (androidJavaClass.Call<bool>("HasKey", key))
+            if (kVDBHandler.HasKey( key))
             {
-                androidJavaClass.Call("DeleteKey", key);
+                kVDBHandler.DeleteKey( key);
                 result.text = "Key Deleted";
             }
             else
@@ -111,21 +72,5 @@ public class PluginTest : MonoBehaviour {
             }
         }
     }
-
-
-
-
-    private void Init()
-    {
-        AndroidJavaClass objct = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject context = objct.GetStatic<AndroidJavaObject>("currentActivity");
-        androidJavaClass = new AndroidJavaObject("com.example.dbprovider.KVDBHandler");
-        androidJavaClass.Call("SetContext", context);
-    }
-
-
-
-
-
 
 }
